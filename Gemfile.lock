@@ -253,6 +253,7 @@ GEM
     mime-types-data (3.2024.0305)
     mini_magick (4.12.0)
     mini_mime (1.1.5)
+    mini_portile2 (2.8.7)
     minitest (5.22.3)
     multi_json (1.15.0)
     multi_test (1.1.0)
@@ -270,6 +271,9 @@ GEM
     net-smtp (0.4.0.1)
       net-protocol
     nio4r (2.7.1)
+    nokogiri (1.16.3)
+      mini_portile2 (~> 2.8.2)
+      racc (~> 1.4)
     nokogiri (1.16.3-x86_64-darwin)
       racc (~> 1.4)
     nokogiri (1.16.3-x86_64-linux)
@@ -477,7 +481,11 @@ GEM
     zeitwerk (2.6.13)
 
 PLATFORMS
+<<<<<<< HEAD
   x86_64-darwin-22
+=======
+  ruby
+>>>>>>> 65c1006bba8b516651ed41289364dc8a67076f8c
   x86_64-darwin-23
   x86_64-linux
 
