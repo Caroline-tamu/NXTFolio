@@ -1,6 +1,13 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe ChatController, type: :controller do
+<<<<<<< HEAD
+  describe 'POST#chat' do
+    it 'sends a new message to the AI chat bot' do
+      post :chat, params: { user_input: 'Hello' }
+=======
   describe "POST#chat" do
     it 'sends a new message to the AI chat bot and validates the response body' do
       # Mock the ChatService to avoid making actual API requests
@@ -31,6 +38,7 @@ RSpec.describe ChatController, type: :controller do
 
       # Additionally, check that the HTTP status is successful (200)
       expect(response).to have_http_status(:success)
+>>>>>>> 65c1006bba8b516651ed41289364dc8a67076f8c
     end
   end
 end

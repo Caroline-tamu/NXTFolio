@@ -234,9 +234,10 @@ function getRoot(node) {
  * @returns {Element} common offset parent
  */
 function findCommonOffsetParent(element1, element2) {
+  let result;
   // This check is needed to avoid errors in case one of the elements isn't defined for any reason
   if (!element1 || !element1.nodeType || !element2 || !element2.nodeType) {
-    return window.document.documentElement;
+    result = window.document.documentElement;
   }
 
   // Here we make sure to give as "start" the element that comes first in the DOM
@@ -254,19 +255,20 @@ function findCommonOffsetParent(element1, element2) {
 
   if (element1 !== commonAncestorContainer && element2 !== commonAncestorContainer || start.contains(end)) {
     if (isOffsetContainer(commonAncestorContainer)) {
-      return commonAncestorContainer;
+      result = commonAncestorContainer;
     }
 
-    return getOffsetParent(commonAncestorContainer);
+    result = getOffsetParent(commonAncestorContainer);
   }
 
   // one of the nodes is inside shadowDOM, find which one
   var element1root = getRoot(element1);
   if (element1root.host) {
-    return findCommonOffsetParent(element1root.host, element2);
+    result = findCommonOffsetParent(element1root.host, element2);
   } else {
-    return findCommonOffsetParent(element1, getRoot(element2).host);
+    result = findCommonOffsetParent(element1, getRoot(element2).host);
   }
+  return result;
 }
 
 /**
@@ -646,7 +648,8 @@ function getArea(_ref) {
  * @argument {Object} options - Modifiers configuration and options
  * @returns {Object} The data object, properly modified
  */
-function computeAutoPlacement(placement, refRect, popper, reference, boundariesElement) {
+function computeAutoPlacement(options) {
+  const {placement, refRect, popper, reference, boundariesElement} = options;
   var padding = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : 0;
 
   if (placement.indexOf('auto') === -1) {
@@ -1135,8 +1138,9 @@ function applyStyle(data) {
  * @param {HTMLElement} popper - The HTML element used as popper.
  * @param {Object} options - Popper.js options
  */
-function applyStyleOnLoad(reference, popper, options, modifierOptions, state) {
+function applyStyleOnLoad(option) {
   // compute reference element offsets
+  const {reference, popper, options, modifierOptions, state} = option;
   var referenceOffsets = getReferenceOffsets(state, popper, reference);
 
   // compute auto placement, store placement inside the data object,
@@ -1563,9 +1567,7 @@ function toValue(str, measurement, popperOffsets, referenceOffsets) {
   var unit = split[2];
 
   // If it's not a number it's an operator, I guess
-  if (!value) {
-    return str;
-  }
+  if (!value) return str;
 
   if (unit.indexOf('%') === 0) {
     var element = void 0;
@@ -1700,18 +1702,11 @@ function offset(data, _ref) {
     offsets = parseOffset(offset, popper, reference, basePlacement);
   }
 
-  if (basePlacement === 'left') {
-    popper.top += offsets[0];
-    popper.left -= offsets[1];
-  } else if (basePlacement === 'right') {
-    popper.top += offsets[0];
-    popper.left += offsets[1];
-  } else if (basePlacement === 'top') {
-    popper.left += offsets[0];
-    popper.top -= offsets[1];
-  } else if (basePlacement === 'bottom') {
-    popper.left += offsets[0];
-    popper.top += offsets[1];
+  switch (basePlacement){
+    case 'left': popper.top += offsets[0]; popper.left -= offsets[1]; break;
+    case 'right': popper.top += offsets[0]; popper.left += offsets[1]; break;
+    case 'top': popper.left += offsets[0]; popper.top -= offsets[1]; break;
+    case 'bottom': popper.left += offsets[0]; popper.top += offsets[1]; break;
   }
 
   data.popper = popper;

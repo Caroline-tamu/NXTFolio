@@ -11,8 +11,14 @@ if (typeof jQuery === 'undefined') {
 +function ($) {
   'use strict';
   var version = $.fn.jquery.split(' ')[0].split('.')
-  if ((version[0] < 2 && version[1] < 9) || (version[0] == 1 && version[1] == 9 && version[2] < 1) || (version[0] > 3)) {
-    throw new Error('Bootstrap\'s JavaScript requires jQuery version 1.9.1 or higher, but lower than version 4')
+  const [major, minor, patch] = version;
+
+  const isOlderVersion = (major === 2 && minor < 9);
+  const isVersionOneNine = (major === 1 && minor === 9 && patch < 1);
+  const isVersionAboveThree = (major > 3);
+
+  if (isOlderVersion || isVersionOneNine || isVersionAboveThree) {
+      throw new Error('Bootstrap\'s JavaScript requires jQuery version 1.9.1 or higher, but lower than version 4');
   }
 }(jQuery);
 
@@ -635,8 +641,7 @@ if (typeof jQuery === 'undefined') {
     if (this.transitioning || !this.$element.hasClass('in')) return
 
     var startEvent = $.Event('hide.bs.collapse')
-    this.$element.trigger(startEvent)
-    if (startEvent.isDefaultPrevented()) return
+    if (this.$element.trigger(startEvent).isDefaultPrevented()) return
 
     var dimension = this.dimension()
 
@@ -1925,9 +1930,7 @@ if (typeof jQuery === 'undefined') {
   }
 
   ScrollSpy.prototype.refresh = function () {
-    var that          = this
-    var offsetMethod  = 'offset'
-    var offsetBase    = 0
+    var that = this, offsetMethod = 'offset', offsetBase = 0;
 
     this.offsets      = []
     this.targets      = []
@@ -2145,9 +2148,8 @@ if (typeof jQuery === 'undefined') {
       if (transition) {
         element[0].offsetWidth // reflow for transition
         element.addClass('in')
-      } else {
-        element.removeClass('fade')
-      }
+      } 
+      else element.removeClass('fade');
 
       if (element.parent('.dropdown-menu').length) {
         element
@@ -2224,6 +2226,7 @@ if (typeof jQuery === 'undefined') {
 
 +function ($) {
   'use strict';
+  let result;
 
   // AFFIX CLASS DEFINITION
   // ======================
@@ -2257,21 +2260,21 @@ if (typeof jQuery === 'undefined') {
     var position     = this.$element.offset()
     var targetHeight = this.$target.height()
 
-    if (offsetTop != null && this.affixed == 'top') return scrollTop < offsetTop ? 'top' : false
+    if (offsetTop != null && this.affixed == 'top') result = scrollTop < offsetTop ? 'top' : false
 
     if (this.affixed == 'bottom') {
-      if (offsetTop != null) return (scrollTop + this.unpin <= position.top) ? false : 'bottom'
-      return (scrollTop + targetHeight <= scrollHeight - offsetBottom) ? false : 'bottom'
+      if (offsetTop != null) result = (scrollTop + this.unpin <= position.top) ? false : 'bottom'
+      result = (scrollTop + targetHeight <= scrollHeight - offsetBottom) ? false : 'bottom'
     }
 
     var initializing   = this.affixed == null
     var colliderTop    = initializing ? scrollTop : position.top
     var colliderHeight = initializing ? targetHeight : height
 
-    if (offsetTop != null && scrollTop <= offsetTop) return 'top'
-    if (offsetBottom != null && (colliderTop + colliderHeight >= scrollHeight - offsetBottom)) return 'bottom'
+    if (offsetTop != null && scrollTop <= offsetTop) result = 'top'
+    if (offsetBottom != null && (colliderTop + colliderHeight >= scrollHeight - offsetBottom)) result = 'bottom'
 
-    return false
+    return result || false
   }
 
   Affix.prototype.getPinnedOffset = function () {

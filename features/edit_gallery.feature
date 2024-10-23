@@ -8,9 +8,10 @@ Background: project in database
 
   Given the following project exist:
   | gallery_title        | gallery_description | gallery_picture |
-  | BigProject           | Here is a project   | "http://example.com/img1.png" |
+  | BigProject           | Here is a project   | http://example.com/img1.png |
 
 Scenario: Enter the page to edit a project
+  Given I have a project created
   Given I am on the details page for "BigProject"
   When I follow "Edit This Project"
   And I should see "Edit Gallery Details"
