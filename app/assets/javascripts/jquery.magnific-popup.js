@@ -564,8 +564,7 @@ MagnificPopup.prototype = {
 	 * @param  {int} index Index of item to parse
 	 */
 	parseEl: function(index) {
-		var item = mfp.items[index],
-			type;
+		var item = mfp.items[index], type;
 
 		if(item.tagName) {
 			item = { el: $(item) };
@@ -579,10 +578,7 @@ MagnificPopup.prototype = {
 
 			// check for 'mfp-TYPE' class
 			for(var i = 0; i < types.length; i++) {
-				if( item.el.hasClass('mfp-'+types[i]) ) {
-					type = types[i];
-					break;
-				}
+				if( item.el.hasClass('mfp-'+types[i]) ) type = types[i]; break;
 			}
 
 			item.src = item.el.attr('data-mfp-src');
@@ -634,7 +630,9 @@ MagnificPopup.prototype = {
 		var midClick = options.midClick !== undefined ? options.midClick : $.magnificPopup.defaults.midClick;
 
 
-		if(!midClick && ( e.which === 2 || e.ctrlKey || e.metaKey || e.altKey || e.shiftKey ) ) {
+		const modifierKeys = [e.ctrlKey, e.metaKey, e.altKey, e.shiftKey];
+
+		if (!midClick && (e.which === 2 || modifierKeys.some(Boolean))) {
 			return;
 		}
 
@@ -711,7 +709,7 @@ MagnificPopup.prototype = {
 	// Check to close popup or not
 	// "target" is an element that was clicked
 	_checkIfClose: function(target) {
-
+		let = result;
 		if($(target).hasClass(PREVENT_CLOSE_CLASS)) {
 			return;
 		}
@@ -720,12 +718,12 @@ MagnificPopup.prototype = {
 		var closeOnBg = mfp.st.closeOnBgClick;
 
 		if(closeOnContent && closeOnBg) {
-			return true;
+			result = true;
 		} else {
 
 			// We close the popup if click is on close button or on preloader. Or if there is no content.
 			if(!mfp.content || $(target).hasClass('mfp-close') || (mfp.preloader && target === mfp.preloader[0]) ) {
-				return true;
+				result = true;
 			}
 
 			// if click is outside the content
@@ -733,15 +731,15 @@ MagnificPopup.prototype = {
 				if(closeOnBg) {
 					// last check, if the clicked element is in DOM, (in case it's removed onclick)
 					if( $.contains(document, target) ) {
-						return true;
+						result = true;
 					}
 				}
 			} else if(closeOnContent) {
-				return true;
+				result = true;
 			}
 
 		}
-		return false;
+		return result || false;
 	},
 	_addClassToMFP: function(cName) {
 		mfp.bgOverlay.addClass(cName);
@@ -764,7 +762,6 @@ MagnificPopup.prototype = {
 		}
 	},
 	_parseMarkup: function(template, values, item) {
-		var arr;
 		if(item.data) {
 			values = $.extend(item.data, values);
 		}
@@ -774,29 +771,29 @@ MagnificPopup.prototype = {
 			if(value === undefined || value === false) {
 				return true;
 			}
-			arr = key.split('_');
-			if(arr.length > 1) {
-				var el = template.find(EVENT_NS + '-'+arr[0]);
+			const arr = key.split('_');
+			const el = template.find(EVENT_NS + '-' + arr[0]);
 
-				if(el.length > 0) {
-					var attr = arr[1];
-					if(attr === 'replaceWith') {
-						if(el[0] !== value[0]) {
-							el.replaceWith(value);
-						}
-					} else if(attr === 'img') {
-						if(el.is('img')) {
-							el.attr('src', value);
-						} else {
-							el.replaceWith( $('<img>').attr('src', value).attr('class', el.attr('class')) );
-						}
-					} else {
-						el.attr(arr[1], value);
-					}
+			if(arr.length > 1 && el.length > 0) {
+				const attr = arr[1];
+				if (attr === 'replaceWith' && el[0] !== value[0]) {
+					el.replaceWith(value);
+					return; // Early return after handling replaceWith
 				}
 
+				if (attr === 'img') {
+					if (el.is('img')) {
+						el.attr('src', value);
+					} else {
+						el.replaceWith($('<img>')
+							.attr('src', value)
+							.attr('class', el.attr('class')));
+					}
+					return; 
+				}
+				el.attr(attr, value);
 			} else {
-				template.find(EVENT_NS + '-'+key).html(value);
+				template.find(EVENT_NS + '-' + key).html(value);
 			}
 		});
 	},

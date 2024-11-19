@@ -121,6 +121,7 @@ bundle config set force_ruby_platform true
 echo ""
 echo "--------------------------------------"
 echo "Setting up the database..."
+
 echo "--------------------------------------"
 sleep 2
 # read -p "Press [Enter] key to continue..."

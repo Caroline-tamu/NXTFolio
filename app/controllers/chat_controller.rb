@@ -1,12 +1,16 @@
-class ChatController < ApplicationController
-  #def index
-  #end
+# frozen_string_literal: true
 
+class ChatController < ApplicationController
   def chat
     user_input = params[:user_input]
+
     chat_service = ChatService.new
     response = chat_service.call(user_input)
 
-    render json: { response: response }
+    if response.nil? || response.empty?
+      render json: { error: 'No response from OpenAI' }, status: :unprocessable_entity
+    else
+      render json: { response: response }, status: :ok
+    end
   end
 end

@@ -8,6 +8,63 @@
  */
 
 //Define the global Chart Variable as a class.
+function elasticEase(t, isIn, isOut) {
+    var s = 1.70158; var p = 0; var a = 1;
+
+    if (t === 0) return 0;
+    if ((t /= 1) === 1) return 1;
+    if (!p) p = 1 * 0.3;
+
+    if (a < Math.abs(1)) {
+        a = 1;
+        s = p / 4;
+    } else {
+        s = p / (2 * Math.PI) * Math.asin(1 / a);
+    }
+
+    if (isIn) {
+        return -(a * Math.pow(2, 10 * (t -= 1)) * Math.sin((t * 1 - s) * (2 * Math.PI) / p));
+    }
+    if (isOut) {
+        return a * Math.pow(2, -10 * t) * Math.sin((t * 1 - s) * (2 * Math.PI) / p) + 1;
+    }
+    // For easeInOutElastic
+    if (t < 1) {
+        return -0.5 * (a * Math.pow(2, 10 * (t -= 1)) * Math.sin((t * 1 - s) * (2 * Math.PI) / p));
+    }
+    return a * Math.pow(2, -10 * (t -= 1)) * Math.sin((t * 1 - s) * (2 * Math.PI) / p) * 0.5 + 1;
+}
+
+
+function calculateAndPopulateScale(config, scaleHeight) {
+    calculateDrawingSizes();
+    const valueBounds = getValueBounds();
+    const labelTemplateString = (config.scaleShowLabels) ? config.scaleLabel : "";
+
+    let calculatedScale;
+    
+    if (!config.scaleOverride) {
+        calculatedScale = calculateScale(
+            scaleHeight,
+            valueBounds.maxSteps,
+            valueBounds.minSteps,
+            valueBounds.maxValue,
+            valueBounds.minValue,
+            labelTemplateString
+        );
+    } else {
+        calculatedScale = {
+            steps: config.scaleSteps,
+            stepValue: config.scaleStepWidth,
+            graphMin: config.scaleStartValue,
+            labels: []
+        };
+        populateLabels(labelTemplateString, calculatedScale.labels, calculatedScale.steps, config.scaleStartValue, config.scaleStepWidth);
+    }
+
+    return calculatedScale;
+}
+
 window.Chart = function(context){
 
 	var chart = this;
@@ -93,26 +150,13 @@ window.Chart = function(context){
 			return 1/2 * (Math.sqrt(1 - (t-=2)*t) + 1);
 		},
 		easeInElastic: function (t) {
-			var s=1.70158;var p=0;var a=1;
-			if (t==0) return 0;  if ((t/=1)==1) return 1;  if (!p) p=1*.3;
-			if (a < Math.abs(1)) { a=1; var s=p/4; }
-			else var s = p/(2*Math.PI) * Math.asin (1/a);
-			return -(a*Math.pow(2,10*(t-=1)) * Math.sin( (t*1-s)*(2*Math.PI)/p ));
+			return elasticEase(t, true, false);
 		},
 		easeOutElastic: function (t) {
-			var s=1.70158;var p=0;var a=1;
-			if (t==0) return 0;  if ((t/=1)==1) return 1;  if (!p) p=1*.3;
-			if (a < Math.abs(1)) { a=1; var s=p/4; }
-			else var s = p/(2*Math.PI) * Math.asin (1/a);
-			return a*Math.pow(2,-10*t) * Math.sin( (t*1-s)*(2*Math.PI)/p ) + 1;
+			return elasticEase(t, false, true);
 		},
 		easeInOutElastic: function (t) {
-			var s=1.70158;var p=0;var a=1;
-			if (t==0) return 0;  if ((t/=1/2)==2) return 1;  if (!p) p=1*(.3*1.5);
-			if (a < Math.abs(1)) { a=1; var s=p/4; }
-			else var s = p/(2*Math.PI) * Math.asin (1/a);
-			if (t < 1) return -.5*(a*Math.pow(2,10*(t-=1)) * Math.sin( (t*1-s)*(2*Math.PI)/p ));
-			return a*Math.pow(2,-10*(t-=1)) * Math.sin( (t*1-s)*(2*Math.PI)/p )*.5 + 1;
+			return elasticEase(t, false, false);
 		},
 		easeInBack: function (t) {
 			var s = 1.70158;
@@ -320,30 +364,18 @@ window.Chart = function(context){
 	
 	this.Bar = function(data,options){
 		chart.Bar.defaults = {
-			scaleOverlay : false,
-			scaleOverride : false,
-			scaleSteps : null,
-			scaleStepWidth : null,
-			scaleStartValue : null,
-			scaleLineColor : "rgba(0,0,0,.1)",
-			scaleLineWidth : 1,
-			scaleShowLabels : true,
-			scaleLabel : "<%=value%>",
-			scaleFontFamily : "'Arial'",
-			scaleFontSize : 12,
-			scaleFontStyle : "normal",
-			scaleFontColor : "#666",
-			scaleShowGridLines : true,
-			scaleGridLineColor : "rgba(0,0,0,.05)",
-			scaleGridLineWidth : 1,
-			barShowStroke : true,
-			barStrokeWidth : 2,
-			barValueSpacing : 5,
-			barDatasetSpacing : 1,
-			animation : true,
-			animationSteps : 60,
-			animationEasing : "easeOutQuart",
-			onAnimationComplete : null
+			scaleOverlay : false, 		scaleOverride : false,
+			scaleSteps : null, 			scaleStepWidth : null,
+			scaleStartValue : null, 	scaleLineColor : "rgba(0,0,0,.1)",
+			scaleLineWidth : 1, 		scaleShowLabels : true,
+			scaleLabel : "<%=value%>", 	scaleFontFamily : "'Arial'",
+			scaleFontSize : 12, 		scaleFontStyle : "normal",
+			scaleFontColor : "#666", 	scaleShowGridLines : true,
+			scaleGridLineColor : "rgba(0,0,0,.05)", scaleGridLineWidth : 1,
+			barShowStroke : true, 		barStrokeWidth : 2,
+			barValueSpacing : 5,		barDatasetSpacing : 1,
+			animation : true, 			animationSteps : 60,
+			animationEasing : "easeOutQuart", onAnimationComplete : null
 		};		
 		var config = (options) ? mergeChartConfig(chart.Bar.defaults,options) : chart.Bar.defaults;
 		
@@ -358,26 +390,7 @@ window.Chart = function(context){
 		var maxSize, scaleHop, calculatedScale, labelHeight, scaleHeight, valueBounds, labelTemplateString;		
 		
 		
-		calculateDrawingSizes();
-		
-		valueBounds = getValueBounds();
-
-		labelTemplateString = (config.scaleShowLabels)? config.scaleLabel : null;
-
-		//Check and set the scale
-		if (!config.scaleOverride){
-			
-			calculatedScale = calculateScale(scaleHeight,valueBounds.maxSteps,valueBounds.minSteps,valueBounds.maxValue,valueBounds.minValue,labelTemplateString);
-		}
-		else {
-			calculatedScale = {
-				steps : config.scaleSteps,
-				stepValue : config.scaleStepWidth,
-				graphMin : config.scaleStartValue,
-				labels : []
-			}
-			populateLabels(labelTemplateString, calculatedScale.labels,calculatedScale.steps,config.scaleStartValue,config.scaleStepWidth);
-		}
+		calculatedScale = calculateAndPopulateScale(config, scaleHeight);
 		
 		scaleHop = maxSize/(calculatedScale.steps);
 
@@ -441,12 +454,8 @@ window.Chart = function(context){
 			scaleAnimation = 1,
 			rotateAnimation = 1;
 			if (config.animation) {
-				if (config.animateScale) {
-					scaleAnimation = animationDecimal;
-				}
-				if (config.animateRotate){
-					rotateAnimation = animationDecimal;
-				}
+				if (config.animateScale) scaleAnimation = animationDecimal;
+				if (config.animateRotate) rotateAnimation = animationDecimal;
 			}
 
 			for (var i=0; i<data.length; i++){
@@ -494,26 +503,7 @@ window.Chart = function(context){
 		//If no labels are defined set to an empty array, so referencing length for looping doesn't blow up.
 		if (!data.labels) data.labels = [];
 		
-		calculateDrawingSizes();
-
-		var valueBounds = getValueBounds();
-
-		labelTemplateString = (config.scaleShowLabels)? config.scaleLabel : null;
-
-		//Check and set the scale
-		if (!config.scaleOverride){
-			
-			calculatedScale = calculateScale(scaleHeight,valueBounds.maxSteps,valueBounds.minSteps,valueBounds.maxValue,valueBounds.minValue,labelTemplateString);
-		}
-		else {
-			calculatedScale = {
-				steps : config.scaleSteps,
-				stepValue : config.scaleStepWidth,
-				graphMin : config.scaleStartValue,
-				labels : []
-			}
-			populateLabels(labelTemplateString, calculatedScale.labels,calculatedScale.steps,config.scaleStartValue,config.scaleStepWidth);
-		}
+		calculatedScale = calculateAndPopulateScale(config, scaleHeight);
 		
 		scaleHop = maxSize/(calculatedScale.steps);
 		
@@ -706,16 +696,11 @@ window.Chart = function(context){
 		animationLoop(config,null,drawPieSegments,ctx);
 				
 		function drawPieSegments (animationDecimal){
-			var cumulativeAngle = -Math.PI/2,
-			scaleAnimation = 1,
-			rotateAnimation = 1;
+			var cumulativeAngle = -Math.PI/2, 
+			scaleAnimation = 1, rotateAnimation = 1;
 			if (config.animation) {
-				if (config.animateScale) {
-					scaleAnimation = animationDecimal;
-				}
-				if (config.animateRotate){
-					rotateAnimation = animationDecimal;
-				}
+				if (config.animateScale) scaleAnimation = animationDecimal;
+				if (config.animateRotate) rotateAnimation = animationDecimal;
 			}
 			for (var i=0; i<data.length; i++){
 				var segmentAngle = rotateAnimation * ((data[i].value/segmentTotal) * (Math.PI*2));
@@ -754,8 +739,7 @@ window.Chart = function(context){
 		
 		function drawPieSegments (animationDecimal){
 			var cumulativeAngle = -Math.PI/2,
-			scaleAnimation = 1,
-			rotateAnimation = 1;
+			scaleAnimation = 1, rotateAnimation = 1;
 			if (config.animation) {
 				if (config.animateScale) {
 					scaleAnimation = animationDecimal;
@@ -789,24 +773,7 @@ window.Chart = function(context){
 	var Line = function(data,config,ctx){
 		var maxSize, scaleHop, calculatedScale, labelHeight, scaleHeight, valueBounds, labelTemplateString, valueHop,widestXLabel, xAxisLength,yAxisPosX,xAxisPosY, rotateLabels = 0;
 			
-		calculateDrawingSizes();
-		
-		valueBounds = getValueBounds();
-		//Check and set the scale
-		labelTemplateString = (config.scaleShowLabels)? config.scaleLabel : "";
-		if (!config.scaleOverride){
-			
-			calculatedScale = calculateScale(scaleHeight,valueBounds.maxSteps,valueBounds.minSteps,valueBounds.maxValue,valueBounds.minValue,labelTemplateString);
-		}
-		else {
-			calculatedScale = {
-				steps : config.scaleSteps,
-				stepValue : config.scaleStepWidth,
-				graphMin : config.scaleStartValue,
-				labels : []
-			}
-			populateLabels(labelTemplateString, calculatedScale.labels,calculatedScale.steps,config.scaleStartValue,config.scaleStepWidth);
-		}
+		calculatedScale = calculateAndPopulateScale(config, scaleHeight);
 		
 		scaleHop = Math.floor(scaleHeight/calculatedScale.steps);
 		calculateXAxisSize();
@@ -1021,24 +988,7 @@ window.Chart = function(context){
 	var Bar = function(data,config,ctx){
 		var maxSize, scaleHop, calculatedScale, labelHeight, scaleHeight, valueBounds, labelTemplateString, valueHop,widestXLabel, xAxisLength,yAxisPosX,xAxisPosY,barWidth, rotateLabels = 0;
 			
-		calculateDrawingSizes();
-		
-		valueBounds = getValueBounds();
-		//Check and set the scale
-		labelTemplateString = (config.scaleShowLabels)? config.scaleLabel : "";
-		if (!config.scaleOverride){
-			
-			calculatedScale = calculateScale(scaleHeight,valueBounds.maxSteps,valueBounds.minSteps,valueBounds.maxValue,valueBounds.minValue,labelTemplateString);
-		}
-		else {
-			calculatedScale = {
-				steps : config.scaleSteps,
-				stepValue : config.scaleStepWidth,
-				graphMin : config.scaleStartValue,
-				labels : []
-			}
-			populateLabels(labelTemplateString, calculatedScale.labels,calculatedScale.steps,config.scaleStartValue,config.scaleStepWidth);
-		}
+		calculatedScale = calculateAndPopulateScale(config, scaleHeight);
 		
 		scaleHop = Math.floor(scaleHeight/calculatedScale.steps);
 		calculateXAxisSize();
@@ -1232,8 +1182,6 @@ window.Chart = function(context){
 			easingFunction = animationOptions[config.animationEasing],
 			percentAnimComplete =(config.animation)? 0 : 1;
 		
-	
-		
 		if (typeof drawScale !== "function") drawScale = function(){};
 		
 		requestAnimFrame(animLoop);
@@ -1254,9 +1202,7 @@ window.Chart = function(context){
 				percentAnimComplete += animFrameAmount;
 				animateFrame();	
 				//Stop the loop continuing forever
-				if (percentAnimComplete <= 1){
-					requestAnimFrame(animLoop);
-				}
+				if (percentAnimComplete <= 1) requestAnimFrame(animLoop);
 				else{
 					if (typeof config.onAnimationComplete == "function") config.onAnimationComplete();
 				}
@@ -1280,7 +1226,8 @@ window.Chart = function(context){
 			};
 	})();
 
-	function calculateScale(drawingHeight,maxSteps,minSteps,maxValue,minValue,labelTemplateString){
+	function calculateScale(options){
+			const {drawingHeight,maxSteps,minSteps,maxValue,minValue,labelTemplateString} = options;
 			var graphMin,graphMax,graphRange,stepValue,numberOfSteps,valueRange,rangeOrderOfMagnitude,decimalNum;
 			
 			valueRange = maxValue - minValue;
@@ -1328,8 +1275,9 @@ window.Chart = function(context){
 	}
 
     //Populate an array of all the labels by interpolating the string.
-    function populateLabels(labelTemplateString, labels, numberOfSteps, graphMin, stepValue) {
-        if (labelTemplateString) {
+    function populateLabels(option) {
+        const {labelTemplateString, labels, numberOfSteps, graphMin, stepValue} = option;
+		if (labelTemplateString) {
             //Fix floating point errors by setting to fixed the on the same decimal as the stepValue.
             for (var i = 1; i < numberOfSteps + 1; i++) {
                 labels.push(tmpl(labelTemplateString, {value: (graphMin + (stepValue * i)).toFixed(getDecimalPlaces(stepValue))}));

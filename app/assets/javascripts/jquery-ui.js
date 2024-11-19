@@ -3,6 +3,13 @@
 * Includes: core.js, widget.js, mouse.js, position.js, slider.js
 * Copyright 2015 jQuery Foundation and other contributors; Licensed MIT */
 
+function updateUiHash(uiHash, index) {
+    if (this.options.values && this.options.values.length) {
+        uiHash.value = this.values(index);
+        uiHash.values = this.values();
+    }
+}
+
 (function( factory ) {
 	if ( typeof define === "function" && define.amd ) {
 
@@ -1081,19 +1088,16 @@ function parseCss( element, property ) {
 
 function getDimensions( elem ) {
 	var raw = elem[0];
+	var width = elem.width()
+	var height = elem.height()
+	var offset = { top: 0, left: 0 }
+
 	if ( raw.nodeType === 9 ) {
-		return {
-			width: elem.width(),
-			height: elem.height(),
-			offset: { top: 0, left: 0 }
-		};
+		return {width, height, offset};
 	}
 	if ( $.isWindow( raw ) ) {
-		return {
-			width: elem.width(),
-			height: elem.height(),
-			offset: { top: elem.scrollTop(), left: elem.scrollLeft() }
-		};
+		offset = { top: elem.scrollTop(), left: elem.scrollLeft() };
+		return {width, height, offset};
 	}
 	if ( raw.preventDefault ) {
 		return {
@@ -1370,18 +1374,15 @@ $.ui.position = {
 				} else {
 					if ( overLeft > overRight ) {
 						position.left = withinOffset + outerWidth - data.collisionWidth;
-					} else {
-						position.left = withinOffset;
-					}
+					} 
+					else position.left = withinOffset;
 				}
 			// too far left -> align with left edge
-			} else if ( overLeft > 0 ) {
-				position.left += overLeft;
+			} else if ( overLeft > 0 ) position.left += overLeft;
 			// too far right -> align with right edge
-			} else if ( overRight > 0 ) {
-				position.left -= overRight;
+			 else if ( overRight > 0 ) position.left -= overRight;
 			// adjust based on position and margin
-			} else {
+			else {
 				position.left = max( position.left - collisionPosLeft, position.left );
 			}
 		},
@@ -1412,13 +1413,11 @@ $.ui.position = {
 					}
 				}
 			// too far up -> align with top
-			} else if ( overTop > 0 ) {
-				position.top += overTop;
+			} else if ( overTop > 0 ) position.top += overTop;
 			// too far down -> align with bottom edge
-			} else if ( overBottom > 0 ) {
-				position.top -= overBottom;
+			 else if ( overBottom > 0 ) position.top -= overBottom;
 			// adjust based on position and margin
-			} else {
+			 else {
 				position.top = max( position.top - collisionPosTop, position.top );
 			}
 		}
@@ -1836,10 +1835,7 @@ var slider = $.widget( "ui.slider", $.ui.mouse, {
 			handle: this.handles[ index ],
 			value: this.value()
 		};
-		if ( this.options.values && this.options.values.length ) {
-			uiHash.value = this.values( index );
-			uiHash.values = this.values();
-		}
+		updateUiHash.call(this, uiHash, index);
 		return this._trigger( "start", event, uiHash );
 	},
 
@@ -1851,9 +1847,11 @@ var slider = $.widget( "ui.slider", $.ui.mouse, {
 		if ( this.options.values && this.options.values.length ) {
 			otherVal = this.values( index ? 0 : 1 );
 
-			if ( ( this.options.values.length === 2 && this.options.range === true ) &&
-					( ( index === 0 && newVal > otherVal) || ( index === 1 && newVal < otherVal ) )
-				) {
+			const isTwoValuesRange = this.options.values.length === 2 && this.options.range === true;
+			const isFirstIndex = index === 0;
+			const isSecondIndex = index === 1;
+
+			if (isTwoValuesRange && ((isFirstIndex && newVal > otherVal) || (isSecondIndex && newVal < otherVal))) {
 				newVal = otherVal;
 			}
 
@@ -1890,10 +1888,7 @@ var slider = $.widget( "ui.slider", $.ui.mouse, {
 			handle: this.handles[ index ],
 			value: this.value()
 		};
-		if ( this.options.values && this.options.values.length ) {
-			uiHash.value = this.values( index );
-			uiHash.values = this.values();
-		}
+		updateUiHash.call(this, uiHash, index);
 
 		this._trigger( "stop", event, uiHash );
 	},
@@ -1904,10 +1899,7 @@ var slider = $.widget( "ui.slider", $.ui.mouse, {
 				handle: this.handles[ index ],
 				value: this.value()
 			};
-			if ( this.options.values && this.options.values.length ) {
-				uiHash.value = this.values( index );
-				uiHash.values = this.values();
-			}
+			updateUiHash.call(this, uiHash, index);
 
 			//store the last changed value index for reference when handles overlap
 			this._lastChangedValue = index;
