@@ -97,10 +97,6 @@ class RoomController < ApplicationController
         if params[:files].present?
           @message.files.attach(params[:files])
         end
-=======
-        @message = Message.create(general_info_id: @user[:id], room_id: @single_room[:id], body: params[:body],
-                                  chatting_with: @chatid)
->>>>>>> 10d6e576558349b632541bc86edada181c9d5ade
       end
 
       redirect_to @chatlink

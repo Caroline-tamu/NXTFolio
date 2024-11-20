@@ -2,15 +2,10 @@
 
 require 'rails_helper'
 
-RSpec.describe GeneralInfo, type: :model do
-  let(:general_info) do
-    described_class.create(id: 11, first_name: 'John', last_name: 'Johns', city: 'Houston', state: 'Texas',
-                           country: 'United States', company: 'test company', industry: 'Creator', highlights: 'test', emailaddr: 'abcd@email.com')
-  end
-  let(:general_info_2) do
-    described_class.create(id: 10, first_name: 'David', last_name: 'Johns', city: 'Houston', state: 'Texas',
-                           country: 'United States', company: 'test company', industry: 'Creator', highlights: 'test', emailaddr: 'abcd2@email.com')
-  end
+  RSpec.describe GeneralInfo, type: :model do
+    let(:general_info) { described_class.create(id: 21, first_name: 'John', last_name: 'Johns', city: 'Houston', state: 'Texas', country: 'United States', company: 'test company', industry: 'Creator', highlights: 'test', emailaddr: 'abcd@email.com') }
+    let(:general_info_2) { described_class.create(id: 20, first_name: 'David', last_name: 'Johns', city: 'Houston', state: 'Texas', country: 'United States', company: 'test company', industry: 'Creator', highlights: 'test', emailaddr: 'abcd2@email.com') }
+
 
   describe '#address' do
     subject(:address) { general_info.address }
@@ -26,40 +21,40 @@ RSpec.describe GeneralInfo, type: :model do
     end
   end
 
-  describe '#follow' do
-    subject(:follow) { general_info.follow(10) }
-    it 'follow the given user' do
-      expect(general_info_2.id).to eq(10)
-      expect(follow).not_to eq(nil)
+    describe '#follow' do
+        subject(:follow) { general_info.follow(20)}
+        it 'follow the given user' do
+            expect(general_info_2.id).to eq(20)
+            expect(follow).not_to eq(nil)
+        end
     end
-  end
 
-  describe '#unfollow' do
-    subject(:follow) { general_info.follow(10) }
-    subject(:unfollow) { general_info.unfollow(10) }
-    it 'unfollow the given user' do
-      expect(general_info_2.id).to eq(10)
-      expect(unfollow).not_to eq(nil)
+    describe '#unfollow' do
+        subject(:follow) { general_info.follow(20)}
+        subject(:unfollow) { general_info.unfollow(20)}
+        it 'unfollow the given user' do
+            expect(general_info_2.id).to eq(20)
+            expect(unfollow).not_to eq(nil)
+        end
     end
-  end
 
-  describe '#get_users_they_follow' do
-    subject(:follow) { general_info.follow(10) }
-    subject(:follow_list) { general_info.get_users_they_follow }
-    it 'get_users_they_follow' do
-      expect(general_info_2.id).to eq(10)
-      expect(follow_list).not_to eq(nil)
+    describe '#get_users_they_follow' do
+        subject(:follow) { general_info.follow(20)}
+        subject(:follow_list) { general_info.get_users_they_follow}
+        it 'get_users_they_follow' do
+            expect(general_info_2.id).to eq(20)
+            expect(follow_list).not_to eq(nil)
+        end
     end
-  end
 
-  describe '#get_followers' do
-    subject(:follow) { general_info.follow(10) }
-    subject(:follower_list) { general_info_2.get_followers }
-    it 'get_followers' do
-      expect(general_info_2.id).to eq(10)
-      expect(follower_list).not_to eq(nil)
+    describe '#get_followers' do
+        subject(:follow) { general_info.follow(20)}
+        subject(:follower_list) { general_info_2.get_followers}
+        it 'get_followers' do
+            expect(general_info_2.id).to eq(20)
+            expect(follower_list).not_to eq(nil)
+        end
     end
-  end
 
   describe '.search' do
     subject(:search_result_1) do

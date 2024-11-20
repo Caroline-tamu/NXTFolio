@@ -42,9 +42,18 @@ module NavigationHelpers
     when /^the DM page$/
       '/dm'
 
-    else
-      send("#{page_name}_path")
-      # raise "Can't find mapping from \"#{page_name}\" to a path."
+      when /^the gallery page$/
+        '/galleries'
+
+      when /^the edit gallery page$/
+        '/galleries/edit'
+
+      when /^the edit gallery page with id (\d+)$/
+        '/galleries/' + $1 + '/edit'
+
+      else
+        send(page_name + "_path")
+        # raise "Can't find mapping from \"#{page_name}\" to a path."
     end
   end
 end

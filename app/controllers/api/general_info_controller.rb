@@ -13,8 +13,9 @@ module Api
         location = "#{user[:city]},#{user[:state]},#{user[:country]}"
         name = "#{user[:first_name]} #{user[:last_name]}"
 
-        login_info = LoginInfo.find_by(userKey: user['userKey'])
-        access_enabled = login_info['enabled'] # !user.deactivated
+            login_info = LoginInfo.find_by(userKey: user['userKey'])
+            access_enabled = login_info ? login_info['enabled'] : false # or set a default value
+
 
         fees_last_30_days = 0
         app = 'NXTFolio'

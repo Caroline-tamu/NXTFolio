@@ -119,6 +119,7 @@ class GalleriesController < ApplicationController
       @gallery.test_picture.clear
       @gallery.save
       render 'edit'
+      return
     else
      #puts("transfer running!!!!!!!!!!!")
      puts("success!!!!!!!!!!!!")

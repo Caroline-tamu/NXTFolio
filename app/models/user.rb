@@ -8,7 +8,13 @@ class User < ApplicationRecord
 
   devise :omniauthable, omniauth_providers: %i[facebook google_oauth2]
 
-  #  scope :all_except, -> (user) { where.not(id: user)}
+   #For password validation
+   validates :password, length: {minimum: 8}, if: :password_required?
+
+   #For email validation
+   validates :email, presence: true, format: { with: URI::MailTo::EMAIL_REGEXP }
+
+#  scope :all_except, -> (user) { where.not(id: user)}
 
   #  def self.new_with_session(params, session)
   #    super.tap do |user|
@@ -19,13 +25,20 @@ class User < ApplicationRecord
 
   #  end
 
-  #  def self.from_omniauth(auth)
-  #    where(provider: auth.provider, uid: auth.uid).first_or_create do |user|
-  #      user.email = auth.info.email
-  #      user.password = Devise.friendly_token[0,20]
-  #      user.name = auth.info.name   # assuming the room model has a name
-  #      user.image = auth.info.image # assuming the room model has an image
-  # room.skip_confirmation!
-  #    end
-  #  end
+#  def self.from_omniauth(auth)
+#    where(provider: auth.provider, uid: auth.uid).first_or_create do |user|
+#      user.email = auth.info.email
+#      user.password = Devise.friendly_token[0,20]
+#      user.name = auth.info.name   # assuming the room model has a name
+#      user.image = auth.info.image # assuming the room model has an image
+      #room.skip_confirmation!
+#    end
+#  end
+
+private
+
+def password_required?
+  new_record? || password.present
+end  
+
 end

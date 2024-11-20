@@ -1,36 +1,36 @@
 Given(/^the following project exist:$/) do |table|
-  table.hashes.each do |gallery|
-    Gallery.create!(gallery_title: gallery['gallery_title'],
-                    gallery_description: gallery['gallery_description'],
-                    gallery_picture: gallery['gallery_picture'])
+    table.hashes.each do |gallery|
+    # Remove " and set the path to the file
+    gallery['gallery_picture'] = gallery['gallery_picture'].gsub('"', '') if gallery['gallery_picture']
+    file_path = Rails.root.join("db", "seed_files", gallery['gallery_picture'])
+
+    # Create a GeneralInfo record with values and a fake profile picture
+    general_info = GeneralInfo.new
+    general_info.first_name = "John"
+    general_info.last_name = "Doe"
+    general_info.userKey = "user123"
+    general_info.company = "TestInc"
+    general_info.industry = "Fashion"
+    general_info.job_name = "Designer"
+    general_info.highlights = "Just a test User"
+    general_info.country = "United States"
+    general_info.state = "Texas"
+    general_info.city = "College Station"
+    general_info.emailaddr = "john.doe@example.com"
+    general_info.profile_picture = Rack::Test::UploadedFile.new(file_path, 'image/jpeg') # Update to 'image/jpeg' for test_pic.jpg
+    general_info.save!
+
+    # Simulate file uploads using Rack::Test::UploadedFile for the Gallery
+    gallery_pictures = [Rack::Test::UploadedFile.new(file_path, 'image/jpeg')] # Update to 'image/jpeg'
+    test_pictures = [Rack::Test::UploadedFile.new(file_path, 'image/jpeg')] # Update to 'image/jpeg'
+
+    # Create the Gallery record with the necessary attributes
+    Gallery.create!(
+      gallery_title: gallery['gallery_title'],
+      gallery_description: gallery['gallery_description'],
+      GeneralInfo_id: general_info.id,
+      gallery_picture: gallery_pictures,
+      test_picture: test_pictures
+    )
+    end
   end
-end
-
-When('I upload a file {string}') do |string|
-  pending # Write code here that turns the phrase above into concrete actions
-end
-
-<<<<<<< HEAD
-Given('I am on the details page for {string}') do |gallery_title|
-  gallery = Gallery.find_by(gallery_title: gallery_title)
-  raise "#{gallery_title} no found" if gallery.nil?
-  visit edit_gallery_path(gallery)
-end
-
-When('I should see exactly {int} images') do |int|
-# When('I should see exactly {float} images') do |float|
-  pending # Write code here that turns the phrase above into concrete actions
-end
-
-When('I fill in {string} with {string}') do |field, updated_info|
-  fill_in field, with: updated_info
-end
-
-When('I press {string}') do |text|
-  click_on(text)
-=======
-When('I should see exactly {int} images') do |int|
-# When('I should see exactly {float} images') do |float|
-  pending # Write code here that turns the phrase above into concrete actions
->>>>>>> 10d6e576558349b632541bc86edada181c9d5ade
-end
