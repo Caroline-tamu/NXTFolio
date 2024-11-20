@@ -11,6 +11,7 @@ Background: project in database
   | BigProject           | Here is a project   | http://example.com/img1.png |
 
 Scenario: Enter the page to edit a project
+  Given I have a project created
   Given I am on the details page for "BigProject"
   When I follow "Edit This Project"
   And I should see "Edit Gallery Details"

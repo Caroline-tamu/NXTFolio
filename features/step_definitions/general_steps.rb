@@ -276,6 +276,7 @@ end
 
 Given(/"(.+)" sends a message to "(.+)" saying "(.+)"/) do |from_user, to_user, msg|
   step "I am logged in as \"#{from_user}\""
+<<<<<<< HEAD
   visit path_to "the DM page"
   step "I click on \"Search\""
   step "I fill in \"user_search\" with \"#{to_user.gsub('.', ' ')}\""
@@ -283,6 +284,13 @@ Given(/"(.+)" sends a message to "(.+)" saying "(.+)"/) do |from_user, to_user, 
   fill_in("body", :with => msg)
   click_link_or_button "Send"
   click_link_or_button "Log out"
+=======
+  visit path_to 'the DM page'
+  step "I select \"#{to_user.gsub('.', ' ')}\" chat"
+  fill_in('body', with: msg)
+  click_link_or_button 'send'
+  click_link_or_button 'Log out'
+>>>>>>> 10d6e576558349b632541bc86edada181c9d5ade
 end
 When('I click on the image with alt text {string}') do |alt_text|
   # Find the image element with the specified alt text

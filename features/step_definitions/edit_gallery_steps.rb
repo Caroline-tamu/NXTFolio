@@ -10,6 +10,7 @@ When('I upload a file {string}') do |string|
   pending # Write code here that turns the phrase above into concrete actions
 end
 
+<<<<<<< HEAD
 Given('I am on the details page for {string}') do |gallery_title|
   gallery = Gallery.find_by(gallery_title: gallery_title)
   raise "#{gallery_title} no found" if gallery.nil?
@@ -27,4 +28,9 @@ end
 
 When('I press {string}') do |text|
   click_on(text)
+=======
+When('I should see exactly {int} images') do |int|
+# When('I should see exactly {float} images') do |float|
+  pending # Write code here that turns the phrase above into concrete actions
+>>>>>>> 10d6e576558349b632541bc86edada181c9d5ade
 end
